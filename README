@@ -1,0 +1,16 @@
+Dependencies:
+* MySQL Proxy (http://dev.mysql.com/downloads/mysql-proxy/index.html)
+* memcached (http://www.danga.com/memcached/)
+* LuaRocks (http://www.luarocks.org/) - to install the md5 and luasocket libraries
+* md5.lua (http://www.keplerproject.org/md5/)
+* Memcached.lua (http://luamemcached.luaforge.net/)
+* LuaSocket (http://www.tecgraf.puc-rio.br/~diego/professional/luasocket/)
+
+Usage:
+
+Assuming you have mysql and memcache instances running locally listening at their respective default ports, you can just run the following commands:
+
+mysql-proxy --proxy-lua-script=mysql-proxy-cache.lua
+
+Then, point your application to mysql proxy on port 4040 instead of 3306. Make sure you specify 127.0.0.1 as the host instead of localhost, otherwise you won't connect to mysql proxy.
+
