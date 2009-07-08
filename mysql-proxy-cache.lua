@@ -20,14 +20,14 @@ end
 function cache_get(query)
     local result = deserialize(memcache:get(to_hash(query)))
     if result then
---        print('HIT: '..to_hash(query)..' ('..query..')')
+        print('HIT: '..to_hash(query)..' ('..query..')')
         cache_hits = cache_hits + 1
     else
---      print('MISS: '..to_hash(query)..' ('..query..')')
+        print('MISS: '..to_hash(query)..' ('..query..')')
         cache_misses = cache_misses + 1
     end
 
---    print('Cache hit ratio: '..cache_hits..'/'..cache_misses..' = '..cache_hits/cache_misses)
+    print('Cache hit ratio: '..cache_hits..'/'..cache_misses..' = '..cache_hits/cache_misses)
 
     return result
 end
@@ -39,7 +39,7 @@ function cache_set(result_packet)
     local fields = result_packet.resultset.fields
     local resultset = {rows={}, fields={}}
 
-  --  print('SET: '..to_hash(query)..' ('..query..')')
+    print('SET: '..to_hash(query)..' ('..query..')')
 
     while fields[field_count] do
         local field = fields[field_count]
