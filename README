@@ -14,3 +14,4 @@ mysql-proxy --proxy-lua-script=mysql-proxy-cache.lua
 
 Then, point your application to mysql proxy on port 4040 instead of 3306. Make sure you specify 127.0.0.1 as the host instead of localhost, otherwise you won't connect to mysql proxy.
 
+Default Timeout for data is 30 seconds. To change this, as it is rather low, and set this way for testing, edit the variable cache_timeout it mysql-proxy-cache.lua
