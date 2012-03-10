@@ -1,10 +1,11 @@
 Dependencies:
-* MySQL Proxy (http://dev.mysql.com/downloads/mysql-proxy/index.html)
-* memcached (http://www.danga.com/memcached/)
-* LuaRocks (http://www.luarocks.org/) - to install the md5 and luasocket libraries
-* md5.lua (http://www.keplerproject.org/md5/)
-* Memcached.lua (http://luamemcached.luaforge.net/)
-* LuaSocket (http://www.tecgraf.puc-rio.br/~diego/professional/luasocket/)
+ 
+ * MySQL Proxy (http://dev.mysql.com/downloads/mysql-proxy/index.html) 0.8.2
+ * memcached (http://www.danga.com/memcached/)
+ * LuaRocks (http://www.luarocks.org/) - to install the md5 and luasocket libraries
+  * md5.lua (http://www.keplerproject.org/md5/)
+  * LuaSocket (http://www.tecgraf.puc-rio.br/~diego/professional/luasocket/)
+ * Memcached.lua (http://luamemcached.luaforge.net/)
 
 Usage:
 
@@ -14,4 +15,29 @@ mysql-proxy --proxy-lua-script=mysql-proxy-cache.lua
 
 Then, point your application to mysql proxy on port 4040 instead of 3306. Make sure you specify 127.0.0.1 as the host instead of localhost, otherwise you won't connect to mysql proxy.
 
-Default Timeout for data is 30 seconds. To change this, as it is rather low, and set this way for testing, edit the variable cache_timeout it mysql-proxy-cache.lua
+To control the cache, we use control strings in the query passed as comments
+
+    /* CACHE: 30 */ SELECT * FROM table;
+    
+will cache the query for 30 seconds. Adjust the ttl value as needed
+
+    /* FLUSH */ SELECT * FROM table;
+    
+will flush the cache for the query, but not actually process the query. You get a empty result set back
+
+Notes:
+
+We currently use the current database name in the key. This is to prevent an issue from
+    USE db1;
+    SELECT * FROM tbl;
+    USE db2;
+    SELECT * FROM tbl;
+    
+returning the incorrect cache. This does mean that
+    USE db1;
+    SELECT * FROM db.tbl;
+    USE db2;
+    SELECT * FROM db.tbl;
+    
+will hash differently. In practice I believe this is a edgecase compared to the first issue.
+
