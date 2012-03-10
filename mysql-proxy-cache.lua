@@ -126,20 +126,6 @@ function read_query( packet )
     if is_query(packet) then
         local query = packet:sub(2)
         local ttl = get_cache_ttl(query)
-        
-        -- Expire the cache if we are instructed to
-        if string.match(query, '/%* FLUSH %*/')
-            then
-            memcache:delete(to_hash(query))
-            proxy.response.type = proxy.MYSQLD_PACKET_OK
-            proxy.response.resultset = {
-                fields = {
-                        { type = proxy.MYSQL_TYPE_LONG, name = "FLUSH", },
-                },
-                rows = { { 'Successful' } }
-            }
-            return proxy.PROXY_SEND_RESULT
-        end
 
         if ttl then
             local resultset = cache_get(query)
@@ -155,7 +141,35 @@ function read_query( packet )
 
                 return proxy.PROXY_SEND_QUERY
             end
-    end
+        end
+        
+        -- Expire the cache if we are instructed to
+        if string.match(query, '/%* FLUSH %*/')
+            then
+            memcache:delete(to_hash(query))
+            proxy.response.type = proxy.MYSQLD_PACKET_OK
+            proxy.response.resultset = {
+                fields = {
+                        { type = proxy.MYSQL_TYPE_LONG, name = "FLUSH", },
+                },
+                rows = { { 'Successful' } }
+            }
+            return proxy.PROXY_SEND_RESULT
+        end
+        
+        -- Look up the hash value
+        if string.match(query, '/%* HASH %*/')
+            then
+            proxy.response.type = proxy.MYSQLD_PACKET_OK
+            proxy.response.resultset = {
+                fields = {
+                        { type = proxy.MYSQL_TYPE_LONG, name = "HASH", },
+                },
+                rows = { { to_hash(query) } }
+            }
+            return proxy.PROXY_SEND_RESULT
+        end
+        
     end
 end
 
