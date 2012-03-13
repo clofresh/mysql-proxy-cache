@@ -11,7 +11,7 @@ Usage:
 
 Assuming you have mysql and memcache instances running locally listening at their respective default ports, you can just run the following commands:
 
-mysql-proxy --proxy-lua-script=mysql-proxy-cache.lua
+mysql-proxy --proxy-lua-script=mpc-memcached.lua 
 
 Then, point your application to mysql proxy on port 4040 instead of 3306. Make sure you specify 127.0.0.1 as the host instead of localhost, otherwise you won't connect to mysql proxy.
 
