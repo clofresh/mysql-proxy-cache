@@ -119,6 +119,32 @@ function read_query( packet )
             return proxy.PROXY_SEND_RESULT
         end
         
+        -- Look up the cache id
+        if Utils.string.starts(query, '/* ID */')
+        then
+            proxy.response.type = proxy.MYSQLD_PACKET_OK
+            proxy.response.resultset = {
+                fields = {
+                        { type = proxy.MYSQL_TYPE_LONG, name = "ID", },
+                },
+                rows = { { get_cache_id() } }
+            }
+            return proxy.PROXY_SEND_RESULT
+        end
+        
+        -- Look up the cache id
+        if Utils.string.starts(query, '/* URL */')
+        then
+            proxy.response.type = proxy.MYSQLD_PACKET_OK
+            proxy.response.resultset = {
+                fields = {
+                        { type = proxy.MYSQL_TYPE_LONG, name = "CACHE URL", },
+                },
+                rows = { { cache.url..'/'..get_cache_id()..'/'..to_hash(query) } }
+            }
+            return proxy.PROXY_SEND_RESULT
+        end
+        
     end
 end
 
