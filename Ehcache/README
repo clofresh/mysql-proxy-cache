@@ -1,0 +1,40 @@
+Dependencies:
+ 
+ * MySQL Proxy (http://dev.mysql.com/downloads/mysql-proxy/index.html) 0.8.2
+ * Ehcache (http://ehcache.org/
+ * LuaRocks (http://www.luarocks.org/) - to install the luasocket libraries
+  * LuaSocket (http://www.tecgraf.puc-rio.br/~diego/professional/luasocket/)
+
+Usage:
+
+Assuming you have mysql and memcache instances running locally listening at their respective default ports, you can just run the following commands:
+
+mysql-proxy --proxy-lua-script=mpc-ehcache.lua 
+
+Then, point your application to mysql proxy on port 4040 instead of 3306. Make sure you specify 127.0.0.1 as the host instead of localhost, otherwise you won't connect to mysql proxy.
+
+To control the cache, we use control strings in the query passed as comments
+
+    /* CACHE: 30 */ SELECT * FROM table;
+    
+will cache the query for 30 seconds. Adjust the ttl value as needed
+
+    /* FLUSH */ SELECT * FROM table;
+    
+will flush the cache for the query, but not actually process the query. You get a empty result set back
+
+    /* REFRESH: 30 */ SELECT * FROM table;
+    
+will flush the cache and update the cache with the result for 30 seconds.
+
+    /* HASH */ SELECT * FROM table;
+    
+Will return the calculated hash for the query
+
+    /* ID */ SELECT * FROM table;
+    
+Will return the calculated cache id. We default to a different cache id per database, with a unset one using DEFAULT. This way we know for sure that the same query for two different databases will return the correct cache entries
+
+    /* URL */ SELECT * FROM table
+    
+Will return the url we are using to cache the element.
