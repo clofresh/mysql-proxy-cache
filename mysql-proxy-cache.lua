@@ -5,12 +5,13 @@ local memcache = Memcached.Connect()
 cache_hits = 0
 cache_misses = 0
 cache_timeout = 30
+verbose = true
 function is_query(packet)
     return packet:byte() == proxy.COM_QUERY
 end
 
 function is_cacheable(query)
-    return query:sub(1,6):lower() == 'select'
+    return query:match("^%s*(.-)%s*$"):sub(1,6):lower() == 'select'
 end
 
 function to_hash(query)
@@ -20,14 +21,20 @@ end
 function cache_get(query)
     local result = deserialize(memcache:get(to_hash(query)))
     if result then
-        print('HIT: '..to_hash(query)..' ('..query..')')
+        if verbose then
+            print('HIT: '..to_hash(query)..' ('..query..')')
+        end
         cache_hits = cache_hits + 1
     else
-        print('MISS: '..to_hash(query)..' ('..query..')')
+        if verbose then
+            print('MISS: '..to_hash(query)..' ('..query..')')
+        end
         cache_misses = cache_misses + 1
     end
 
-    print('Cache hit ratio: '..cache_hits..'/'..cache_misses..' = '..cache_hits/cache_misses)
+    if verbose then
+        print('Cache hit ratio: '..cache_hits..'/'..cache_misses..' = '..cache_hits/cache_misses)
+    end
 
     return result
 end
@@ -39,7 +46,9 @@ function cache_set(result_packet)
     local fields = result_packet.resultset.fields
     local resultset = {rows={}, fields={}}
 
-    print('SET: '..to_hash(query)..' ('..query..')')
+    if verbose then
+        print('SET: '..to_hash(query)..' ('..query..')')
+    end
 
     while fields[field_count] do
         local field = fields[field_count]
