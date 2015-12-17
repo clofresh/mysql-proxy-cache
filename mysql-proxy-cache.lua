@@ -10,7 +10,7 @@ function is_query(packet)
 end
 
 function is_cacheable(query)
-    return query:sub(1,6):lower() == 'select'
+    return query:match("^%s*(.-)%s*$"):sub(1,6):lower() == 'select'
 end
 
 function to_hash(query)
